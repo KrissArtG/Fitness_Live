@@ -19,7 +19,7 @@ export const routineData = {
             reps: 10,
             sets: 3,
             muscle_group: ["femoral", "glúteo"],
-            gif_url: "https://example.com/peso-muerto-rumano.gif",
+            gif_url: "https://cdn.jefit.com/assets/img/exercises/gifs/199.gif",
           },
           {
             name: "Sentadilla búlgara",
