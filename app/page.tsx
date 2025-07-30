@@ -1,247 +1,86 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { routineData } from "@/data/routineData"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Dumbbell, Clock, Target, ChevronLeft, ChevronRight, Calendar } from "lucide-react"
+import { Clock, Target, Dumbbell, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 
-const routineData = {
-  routine: {
-    name: "Rutina Semanal de Gimnasio",
-    duration: "5 días",
-    days: [
-      {
-        day: "lunes",
-        name: "Glúteo y Femoral",
-        exercises: [
-          {
-            name: "Hip thrust",
-            reps: 8,
-            sets: 4,
-            muscle_group: ["glúteo", "femoral"],
-          },
-          {
-            name: "Peso muerto rumano",
-            reps: 10,
-            sets: 3,
-            muscle_group: ["femoral", "glúteo"],
-          },
-          {
-            name: "Sentadilla búlgara",
-            reps: 10,
-            sets: 4,
-            muscle_group: ["cuádriceps", "glúteo"],
-          },
-          {
-            name: "Máquina de abductores",
-            reps: 10,
-            sets: 4,
-            muscle_group: ["abductores"],
-          },
-          {
-            name: "Patada en polea",
-            reps: 10,
-            sets: 3,
-            muscle_group: ["glúteo"],
-          },
-        ],
-      },
-      {
-        day: "martes",
-        name: "Espalda + Bíceps + Cardio",
-        exercises: [
-          {
-            name: "Jalón abierto",
-            reps: 12,
-            sets: 3,
-            muscle_group: ["espalda"],
-          },
-          {
-            name: "Jalón cerrado",
-            reps: 12,
-            sets: 3,
-            muscle_group: ["espalda"],
-          },
-          {
-            name: "Remo en máquina",
-            reps: 12,
-            sets: 3,
-            muscle_group: ["espalda"],
-          },
-          {
-            name: "Curl de bíceps con barra",
-            reps: 10,
-            sets: 3,
-            muscle_group: ["bíceps"],
-          },
-          {
-            name: "Curl de bíceps martillo",
-            reps: 10,
-            sets: 3,
-            muscle_group: ["bíceps"],
-          },
-          {
-            name: "Cinta (caminadora)",
-            duration: "10 minutos",
-            type: "cardio",
-            muscle_group: ["cardio"],
-          },
-        ],
-      },
-      {
-        day: "miércoles",
-        name: "Cuádriceps + Glúteo + Aductores",
-        exercises: [
-          {
-            name: "Sentadilla goblet",
-            reps: 12,
-            sets: 4,
-            muscle_group: ["cuádriceps", "glúteo"],
-          },
-          {
-            name: "Sentadilla sumo",
-            reps: 10,
-            sets: 4,
-            muscle_group: ["cuádriceps", "glúteo", "aductores"],
-          },
-          {
-            name: "Desplantes",
-            reps: 8,
-            sets: 4,
-            muscle_group: ["cuádriceps", "glúteo"],
-          },
-          {
-            name: "Extensión de cuádriceps",
-            reps: 8,
-            sets: 4,
-            muscle_group: ["cuádriceps"],
-          },
-          {
-            name: "Máquina de abductores",
-            reps: 10,
-            sets: 4,
-            muscle_group: ["abductores"],
-          },
-        ],
-      },
-      {
-        day: "jueves",
-        name: "Pecho + Hombro + Tríceps",
-        exercises: [
-          {
-            name: "Press de hombros máquina",
-            reps: 10,
-            sets: 4,
-            muscle_group: ["hombros"],
-          },
-          {
-            name: "Press de pecho con barra",
-            reps: 8,
-            sets: 4,
-            muscle_group: ["pecho"],
-          },
-          {
-            name: "Jalón en máquina",
-            reps: 12,
-            sets: 3,
-            muscle_group: ["espalda"],
-          },
-          {
-            name: "Elevaciones laterales con mancuerna",
-            reps: 10,
-            sets: 3,
-            muscle_group: ["hombros"],
-          },
-          {
-            name: "Extensiones de tríceps con cable",
-            reps: 10,
-            sets: 3,
-            muscle_group: ["tríceps"],
-          },
-          {
-            name: "Cinta (caminadora)",
-            duration: "10 minutos",
-            type: "cardio",
-            muscle_group: ["cardio"],
-          },
-        ],
-      },
-      {
-        day: "viernes",
-        name: "Pierna Completa",
-        exercises: [
-          {
-            name: "Hip thrust",
-            reps: 8,
-            sets: 4,
-            muscle_group: ["glúteo", "femoral"],
-          },
-          {
-            name: "Peso muerto rumano",
-            reps: 10,
-            sets: 3,
-            muscle_group: ["femoral", "glúteo"],
-          },
-          {
-            name: "Extensiones de cuádriceps",
-            reps: 8,
-            sets: 4,
-            muscle_group: ["cuádriceps"],
-          },
-          {
-            name: "Prensa",
-            reps: 10,
-            sets: 4,
-            muscle_group: ["cuádriceps", "glúteo"],
-          },
-          {
-            name: "Sentadilla Smith",
-            reps: 8,
-            sets: 4,
-            muscle_group: ["cuádriceps", "glúteo"],
-          },
-          {
-            name: "Máquina de abductores",
-            reps: 10,
-            sets: 4,
-            muscle_group: ["abductores"],
-          },
-        ],
-      },
-    ],
-  },
+interface Exercise {
+  name: string
+  reps?: number
+  sets?: number
+  duration?: string
+  type?: string
+  muscle_group: string[]
+  gif_url?: string
+}
+
+interface WeightLog {
+  liss: number
+  kriss: number
 }
 
 const muscleGroupColors: { [key: string]: string } = {
-  glúteo: "bg-pink-100 text-pink-800",
-  femoral: "bg-purple-100 text-purple-800",
-  cuádriceps: "bg-blue-100 text-blue-800",
-  espalda: "bg-green-100 text-green-800",
-  bíceps: "bg-orange-100 text-orange-800",
-  pecho: "bg-red-100 text-red-800",
-  hombros: "bg-yellow-100 text-yellow-800",
-  tríceps: "bg-indigo-100 text-indigo-800",
-  abductores: "bg-teal-100 text-teal-800",
-  aductores: "bg-cyan-100 text-cyan-800",
-  cardio: "bg-gray-100 text-gray-800",
+  glúteo: "bg-pink-100 text-pink-700",
+  femoral: "bg-purple-100 text-purple-700",
+  cuádriceps: "bg-blue-100 text-blue-700",
+  abductores: "bg-yellow-100 text-yellow-700",
+  aductores: "bg-teal-100 text-teal-700",
+  espalda: "bg-green-100 text-green-700",
+  bíceps: "bg-orange-100 text-orange-700",
+  pecho: "bg-red-100 text-red-700",
+  hombros: "bg-indigo-100 text-indigo-700",
+  tríceps: "bg-cyan-100 text-cyan-700",
+  cardio: "bg-gray-100 text-gray-700",
 }
 
-export default function GymRoutineApp() {
+const Page = () => {
+  const routine = routineData.routine
   const [currentDay, setCurrentDay] = useState(0)
   const [completedExercises, setCompletedExercises] = useState<Set<string>>(new Set())
+  const [weightLogs, setWeightLogs] = useState<{ [key: string]: WeightLog }>({})
+  const [showGif, setShowGif] = useState<{ [key: string]: boolean }>({})
 
-  const routine = routineData.routine
+  // Auto-select current day of the week
+  useEffect(() => {
+    const today = new Date().getDay() // 0 = Sunday, 1 = Monday, etc.
+    // Map to your 5-day routine: Monday(1) = 0, Tuesday(2) = 1, Wednesday(3) = 2, Thursday(4) = 3, Friday(5) = 4
+    if (today >= 1 && today <= 5) {
+      setCurrentDay(today - 1) // Monday = 0, Tuesday = 1, etc.
+    }
+  }, [])
+
   const currentWorkout = routine.days[currentDay]
 
   const toggleExerciseComplete = (exerciseName: string) => {
-    const newCompleted = new Set(completedExercises)
-    if (newCompleted.has(exerciseName)) {
-      newCompleted.delete(exerciseName)
-    } else {
-      newCompleted.add(exerciseName)
-    }
-    setCompletedExercises(newCompleted)
+    setCompletedExercises((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(exerciseName)) {
+        newSet.delete(exerciseName)
+      } else {
+        newSet.add(exerciseName)
+      }
+      return newSet
+    })
+  }
+
+  const updateWeight = (exerciseName: string, person: "liss" | "kriss", weight: number) => {
+    setWeightLogs((prev) => ({
+      ...prev,
+      [exerciseName]: {
+        ...prev[exerciseName],
+        [person]: weight,
+      },
+    }))
+  }
+
+  const toggleGif = (exerciseName: string) => {
+    setShowGif((prev) => ({
+      ...prev,
+      [exerciseName]: !prev[exerciseName],
+    }))
   }
 
   const nextDay = () => {
@@ -264,6 +103,9 @@ export default function GymRoutineApp() {
           <div className="flex items-center justify-center gap-2 text-slate-600">
             <Calendar className="h-4 w-4" />
             <span className="text-sm">{routine.duration}</span>
+          </div>
+          <div className="mt-2 text-xs text-slate-500">
+            Hoy es {new Date().toLocaleDateString("es-ES", { weekday: "long" })}
           </div>
         </div>
 
@@ -289,14 +131,16 @@ export default function GymRoutineApp() {
 
         {/* Day Indicators */}
         <div className="flex justify-center gap-2 mb-6">
-          {routine.days.map((_, index) => (
+          {routine.days.map((day, index) => (
             <button
               key={index}
               onClick={() => setCurrentDay(index)}
-              className={`w-3 h-3 rounded-full transition-colors ${
-                index === currentDay ? "bg-slate-700" : "bg-slate-300"
+              className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                index === currentDay ? "bg-slate-700 text-white" : "bg-slate-200 text-slate-600 hover:bg-slate-300"
               }`}
-            />
+            >
+              {day.day.slice(0, 3)}
+            </button>
           ))}
         </div>
 
@@ -304,7 +148,7 @@ export default function GymRoutineApp() {
         <div className="space-y-4">
           {currentWorkout.exercises.map((exercise, index) => (
             <Card
-              key={index}
+              key={`${exercise.name}-${index}`}
               className={`transition-all duration-200 ${
                 completedExercises.has(exercise.name) ? "bg-green-50 border-green-200" : "hover:shadow-md"
               }`}
@@ -320,21 +164,45 @@ export default function GymRoutineApp() {
                       {exercise.name}
                     </h3>
                   </div>
-                  <button
-                    onClick={() => toggleExerciseComplete(exercise.name)}
-                    className={`w-6 h-6 rounded-full border-2 transition-colors ${
-                      completedExercises.has(exercise.name)
-                        ? "bg-green-500 border-green-500"
-                        : "border-slate-300 hover:border-green-400"
-                    }`}
-                  >
-                    {completedExercises.has(exercise.name) && (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full" />
-                      </div>
+                  <div className="flex gap-2">
+                    {exercise.gif_url && (
+                      <button
+                        onClick={() => toggleGif(exercise.name)}
+                        className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
+                      >
+                        {showGif[exercise.name] ? "Ocultar" : "Ver GIF"}
+                      </button>
                     )}
-                  </button>
+                    <button
+                      onClick={() => toggleExerciseComplete(exercise.name)}
+                      className={`w-6 h-6 rounded-full border-2 transition-colors ${
+                        completedExercises.has(exercise.name)
+                          ? "bg-green-500 border-green-500"
+                          : "border-slate-300 hover:border-green-400"
+                      }`}
+                    >
+                      {completedExercises.has(exercise.name) && (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                        </div>
+                      )}
+                    </button>
+                  </div>
                 </div>
+
+                {/* Exercise GIF */}
+                {showGif[exercise.name] && exercise.gif_url && (
+                  <div className="mb-4">
+                    <img
+                      src={exercise.gif_url || "/placeholder.svg"}
+                      alt={`${exercise.name} demonstration`}
+                      className="w-full max-h-64 object-contain rounded-lg bg-gray-50 border"
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.svg?height=200&width=300&text=GIF+no+disponible"
+                      }}
+                    />
+                  </div>
+                )}
 
                 <div className="flex items-center gap-4 mb-3">
                   {exercise.type === "cardio" ? (
@@ -355,12 +223,41 @@ export default function GymRoutineApp() {
                   )}
                 </div>
 
+                {/* Weight Tracking Section */}
+                {exercise.type !== "cardio" && (
+                  <div className="mb-3 p-3 bg-slate-50 rounded-lg">
+                    <h4 className="text-sm font-medium text-slate-700 mb-2">Peso utilizado</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-slate-600 mb-1">Liss</label>
+                        <input
+                          type="number"
+                          placeholder="kg"
+                          value={weightLogs[exercise.name]?.liss || ""}
+                          onChange={(e) => updateWeight(exercise.name, "liss", Number(e.target.value))}
+                          className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-600 mb-1">Kriss</label>
+                        <input
+                          type="number"
+                          placeholder="kg"
+                          value={weightLogs[exercise.name]?.kriss || ""}
+                          onChange={(e) => updateWeight(exercise.name, "kriss", Number(e.target.value))}
+                          className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-2">
                   {exercise.muscle_group.map((muscle, muscleIndex) => (
                     <Badge
                       key={muscleIndex}
                       variant="secondary"
-                      className={`text-xs ${muscleGroupColors[muscle] || "bg-gray-100 text-gray-800"}`}
+                      className={`${muscleGroupColors[muscle] || "bg-gray-100 text-gray-800"} hover:opacity-80 text-xs`}
                     >
                       {muscle}
                     </Badge>
@@ -395,3 +292,5 @@ export default function GymRoutineApp() {
     </div>
   )
 }
+
+export default Page
